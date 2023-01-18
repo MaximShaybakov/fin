@@ -113,6 +113,7 @@ class LoginAccount(APIView):
     # Авторизация методом POST
     def post(self, request, *args, **kwargs):
 
+
         if {'email', 'password'}.issubset(request.data):
             user = authenticate(request, username=request.data['email'], password=request.data['password'])
 
@@ -124,7 +125,7 @@ class LoginAccount(APIView):
 
             return JsonResponse({'Status': False, 'Errors': 'Не удалось авторизовать'})
 
-        return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+        return Response(request.data)
     
     
 class AccountDetails(APIView):
