@@ -1,0 +1,60 @@
+name: django testing and deploy
+
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-22.04
+    env:
+      POSTGRES_USER: maxim
+      POSTGRES_PASS: 0912
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5431
+      POSTGRES_DB: orders
+      SECRET_KEY: django-insecure-a7lgh4idc+xa3+vu2cfmf8sv_5qvz=z__i)r8#3b$ew1oh6rk&
+      ALLOWED_HOSTS: 127.0.0.1,localhost
+
+    services:
+      postgres_main:
+        image: postgres:14.5
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASS: ${{ env.POSTGRES_PASS }}
+          POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ env.POSTGRES_PORT }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          SECRET_KEY: ${{ env.SECRET_KEY }}
+          ALLOWED_HOSTS: ${{ env.ALLOWED_HOSTS }}
+
+
+    steps: 
+      - name: Check changes
+        uses: actions/checkout@v2
+
+      - name: install python3 
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      # - name: Checking code on pep8
+      #   run: flake8 main
+
+      # - name: Run Tests 
+      #   run: python3 manage.py test
+      #   env:
+      #     SECRET_KEY: ${{ env.SECRET_KEY }}
+      #     DEBUG: "0"
+      #     ALLOWED_HOSTS: ${{ env.ALLOWED_HOSTS }}
+      #     DB_ENGINE: django.db.backends.postgresql
+      #     DB_NAME: ${{ env.POSTGRES_DB }}
+      #     DB_USER: ${{ env.POSTGRES_USER }}
+      #     DB_PASSWORD: ${{ env.POSTGRES_PASS }}
+      #     DB_HOST: ${{ env.POSTGRES_HOST }}
+      #     DB_PORT: ${{ env.POSTGRES_PORT }}
