@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from .models import Shop, Category, ProductInfo, ProductParameter, Product, Parameter
 from .serializers import UserSerializer
 # from .signals import new_user_registered
@@ -14,7 +13,6 @@ from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 import requests
 
-# Create your views here.
 
 class PartnerUpdate(APIView):
     """

@@ -5,3 +5,5 @@ __pycache__/
 requests-examples.http
 launch.json
 signals.py
+.vscode/
+.idea/

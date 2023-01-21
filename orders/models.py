@@ -70,18 +70,14 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     company = models.CharField(verbose_name='Компания', max_length=40, blank=True)
     position = models.CharField(verbose_name='Должность', max_length=40, blank=True)
-    username_validator = UnicodeUsernameValidator()
     username = models.CharField(_('username'),
                                 max_length=150,
-                                help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-                                validators=[username_validator],
+                                validators=[UnicodeUsernameValidator(), ],
                                 error_messages={'unique': _("A user with that username already exists."),
                                                 },
                                 )
     is_active = models.BooleanField(_('active'),
                                     default=False,
-                                    help_text=_('Designates whether this user should be treated as active. ' 
-                                                'Unselect this instead of deleting accounts.'),
                                     )
     type = models.CharField(verbose_name='Тип пользователя',
                             choices=USER_TYPE_CHOICES,
