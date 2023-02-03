@@ -1,6 +1,5 @@
 from .models import Shop, Category, ProductInfo, ProductParameter, Product, Parameter
 from .serializers import UserSerializer
-# from .signals import new_user_registered
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.password_validation import validate_password
@@ -24,8 +23,7 @@ class PartnerUpdate(APIView):
         
         # if request.user.type != 'shop':
         #     return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
-        
-        
+
         url = request.data.get('url')
         if url:
             validate_url = URLValidator()
@@ -96,7 +94,6 @@ class RegisterAccount(APIView):
                     user = user_serializer.save()
                     user.set_password(request.data['password'])
                     user.save()
-                    # new_user_registered.send(sender=self.__class__, user_id=user.id)
                     return JsonResponse({'Status': True})
                 else:
                     return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
@@ -110,10 +107,9 @@ class LoginAccount(APIView):
     """
     # Авторизация методом POST
     def post(self, request, *args, **kwargs):
-
-
+        print(request.POST)
         if {'email', 'password'}.issubset(request.data):
-            user = authenticate(request, username=request.data['email'], password=request.data['password'])
+            user = authenticate(request.data, username=request.data['email'], password=request.data['password'])
 
             if user is not None:
                 if user.is_active:
