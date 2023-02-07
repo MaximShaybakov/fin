@@ -1,6 +1,6 @@
 from distutils.util import strtobool
 from .models import Shop, Category, ProductInfo, ProductParameter, Product, Parameter, \
-    Contact, Order, User
+    Contact, Order, ConfirmEmailToken
 from .serializers import UserSerializer, CategorySerializer, ProductInfoSerializer, \
     ShopSerializer, ContactSerializer, OrderSerializer
 from django.contrib.auth import authenticate
@@ -361,5 +361,28 @@ class PartnerState(APIView):
                 return JsonResponse({'Status': True})
             except ValueError as error:
                 return JsonResponse({'Status': False, 'Errors': str(error)})
+
+        return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+
+
+class ConfirmAccount(APIView):
+    """
+    Класс для подтверждения почтового адреса
+    """
+    # Регистрация методом POST
+    def post(self, request, *args, **kwargs):
+
+        # проверяем обязательные аргументы
+        if {'email', 'token'}.issubset(request.data):
+
+            token = ConfirmEmailToken.objects.filter(user__email=request.data['email'],
+                                                     key=request.data['token']).first()
+            if token:
+                token.user.is_active = True
+                token.user.save()
+                token.delete()
+                return JsonResponse({'Status': True})
+            else:
+                return JsonResponse({'Status': False, 'Errors': 'Неправильно указан токен или email'})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
