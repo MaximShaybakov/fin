@@ -1,5 +1,6 @@
+from distutils.util import strtobool
 from .models import Shop, Category, ProductInfo, ProductParameter, Product, Parameter, \
-    Contact, Order
+    Contact, Order, User
 from .serializers import UserSerializer, CategorySerializer, ProductInfoSerializer, \
     ShopSerializer, ContactSerializer, OrderSerializer
 from django.contrib.auth import authenticate
@@ -7,10 +8,13 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.password_validation import validate_password
 from django.db import IntegrityError
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
+from rest_framework.decorators import permission_classes
 from django.db.models import Q, Sum, F
 from rest_framework.generics import ListAPIView
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 from django.http import JsonResponse
 from yaml import Loader, load as load_yaml
 from rest_framework.response import Response
@@ -25,8 +29,8 @@ class PartnerUpdate(APIView):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
         
-        # if request.user.type != 'shop':
-        #     return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
+        if request.user.type != 'shop':
+            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
 
         url = request.data.get('url')
         if url:
@@ -65,15 +69,15 @@ class PartnerUpdate(APIView):
                 return JsonResponse({'Status': True})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
-    
-    
+
+
+@permission_classes([AllowAny])
 class RegisterAccount(APIView):
     """
     Для регистрации покупателей
     """
     # Регистрация методом POST
     def post(self, request, *args, **kwargs):
-        print(request.data)
 
         # проверяем обязательные аргументы
         if {'first_name', 'last_name', 'email', 'password', 'company', 'position'}.issubset(request.data):
@@ -95,7 +99,6 @@ class RegisterAccount(APIView):
                 request.data.update({})
                 user_serializer = UserSerializer(data=request.data)
                 if user_serializer.is_valid():
-                    # сохраняем пользователя
                     user = user_serializer.save()
                     user.set_password(request.data['password'])
                     user.save()
@@ -112,7 +115,6 @@ class LoginAccount(APIView):
     """
     # Авторизация методом POST
     def post(self, request, *args, **kwargs):
-        print(request.POST)
         if {'email', 'password'}.issubset(request.data):
             user = authenticate(request.data, username=request.data['email'], password=request.data['password'])
 
@@ -125,8 +127,8 @@ class LoginAccount(APIView):
             return JsonResponse({'Status': False, 'Errors': 'Не удалось авторизовать'})
 
         return Response(request.data)
-    
-    
+
+
 class AccountDetails(APIView):
     """
     Класс для работы данными пользователя
@@ -320,6 +322,9 @@ class OrderView(APIView):
                 else:
                     if is_updated:
                         # new_order.send(sender=self.__class__, user_id=request.user.id)
+                        send_mail(subject=None, message='Status "Done"',
+                                  recipient_list=[str(request.data['email'])],
+                                  fail_silently=True)
                         return JsonResponse({'Status': True})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
@@ -352,7 +357,7 @@ class PartnerState(APIView):
         state = request.data.get('state')
         if state:
             try:
-                # Shop.objects.filter(user_id=request.user.id).update(state=strtobool(state))
+                Shop.objects.filter(user_id=request.user.id).update(state=strtobool(state))
                 return JsonResponse({'Status': True})
             except ValueError as error:
                 return JsonResponse({'Status': False, 'Errors': str(error)})

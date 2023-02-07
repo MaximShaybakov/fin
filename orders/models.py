@@ -77,7 +77,7 @@ class User(AbstractUser):
                                                 },
                                 )
     is_active = models.BooleanField(_('active'),
-                                    default=False,
+                                    default=True,
                                     )
     type = models.CharField(verbose_name='Тип пользователя',
                             choices=USER_TYPE_CHOICES,
