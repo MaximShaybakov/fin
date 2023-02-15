@@ -8,8 +8,8 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.password_validation import validate_password
 from django.db import IntegrityError
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
-from rest_framework.decorators import permission_classes
+from datetime import datetime
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Q, Sum, F
 from rest_framework.generics import ListAPIView
 from django.core.validators import URLValidator
@@ -71,11 +71,11 @@ class PartnerUpdate(APIView):
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
 
-@permission_classes([AllowAny])
 class RegisterAccount(APIView):
     """
     Для регистрации покупателей
     """
+    permission_classes = (AllowAny,)
     # Регистрация методом POST
     def post(self, request, *args, **kwargs):
 
@@ -111,21 +111,21 @@ class RegisterAccount(APIView):
 
 class LoginAccount(APIView):
     """
-    Класс для авторизации пользователей
+    Class for user authorization
     """
-    # Авторизация методом POST
+    permission_classes = [AllowAny,]
+    # Authorization by POST method
     def post(self, request, *args, **kwargs):
+        print(request.data)
         if {'email', 'password'}.issubset(request.data):
             user = authenticate(request.data, username=request.data['email'], password=request.data['password'])
 
             if user is not None:
                 if user.is_active:
+                    print(user.last_login)
                     token, _ = Token.objects.get_or_create(user=user)
-
                     return JsonResponse({'Status': True, 'Token': token.key})
-
             return JsonResponse({'Status': False, 'Errors': 'Не удалось авторизовать'})
-
         return Response(request.data)
 
 
@@ -337,6 +337,7 @@ class PartnerState(APIView):
 
     # получить текущий статус
     def get(self, request, *args, **kwargs):
+        print(request.data)
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
