@@ -75,7 +75,7 @@ class RegisterAccount(APIView):
     """
     Для регистрации покупателей
     """
-    permission_classes = (AllowAny,)
+    permission_classes = [AllowAny,]
     # Регистрация методом POST
     def post(self, request, *args, **kwargs):
 
@@ -160,7 +160,7 @@ class AccountDetails(APIView):
                     error_array.append(item)
                 return JsonResponse({'Status': False, 'Errors': {'password': error_array}})
             else:
-                request.user.set_password(request.data['password'])
+                request.user.set_password(request.data['password'])  # НЕ ХЭШИРУЕТ ПАРОЛИ!
 
         # проверяем остальные данные
         user_serializer = UserSerializer(request.user, data=request.data, partial=True)
