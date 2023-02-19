@@ -116,13 +116,13 @@ class LoginAccount(APIView):
     permission_classes = [AllowAny,]
     # Authorization by POST method
     def post(self, request, *args, **kwargs):
-        print(request.data)
+        # print(request.data)
         if {'email', 'password'}.issubset(request.data):
             user = authenticate(request.data, username=request.data['email'], password=request.data['password'])
 
             if user is not None:
                 if user.is_active:
-                    print(user.last_login)
+                    # print(user.last_login)
                     token, _ = Token.objects.get_or_create(user=user)
                     return JsonResponse({'Status': True, 'Token': token.key})
             return JsonResponse({'Status': False, 'Errors': 'Не удалось авторизовать'})
@@ -230,6 +230,8 @@ class ContactView(APIView):
 
     # добавить новый контакт
     def post(self, request, *args, **kwargs):
+        print(request.stream.read())
+
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 

@@ -1,5 +1,6 @@
 import requests
 from pprint import pprint
+import json
 
 base_url = 'http://127.0.0.1:8000/api/v1/'
 
@@ -17,10 +18,11 @@ us = {'update': 'partner/update/',
 
 TOKEN_user1 = 'Token f50360db6c2e48baa4331124b90ec8863a37d772'
 TOKEN_shop1 = 'Token 7a802a065d33b79c790072f37113752aab74ca63'
+TOKEN_jorik = 'Token f91324ab9b1fff8c998fb0d8862521409c4fb1ee'
 
 new_user = {'first_name': 'fn_user1',
             'last_name': 'ln_user1',
-            'email': 'passw_user1@mail.ru',
+            'email': 'mail_user1@mail.ru',
             'password': 'hgj8756*&%$7',
             'company': 'yandex',
             'position': 'engineer',
@@ -61,8 +63,20 @@ new_shop = {'first_name': 'fn_shop1',
 #                                                   'Authorization': f'{TOKEN_user1}'})
 
 '''Contact'''
-# data = requests.get(base_url + us['contacts'], headers={'Content-type': 'application/json',  # headers!!!
-#                                                   'Authorization': f'{TOKEN_user1}'})
+# data = requests.get(base_url + us['contacts'], headers={'Content-type': 'application/json',
+#                                                         'Authorization': f'{TOKEN_user1}'})
+
+data = requests.post(base_url + us['contacts'], headers={'Content-type': 'application/json',
+                                                        'Authorization': f'{TOKEN_user1}'},
+                     data={'user': 3,
+                           'city': 'city_user1',
+                           'street': 'street_user1',
+                           'house': 'house_user1',
+                           'phone': 'phone_user1'})
+
+# data = requests.delete(base_url + us['contacts'], headers={'Content-type': 'application/json',
+#                                                            'Authorization': f'{TOKEN_user1}'},
+#                        data={'items': '3'})
 
 '''Shops'''
 # data = requests.get(base_url + us['shops'], headers={'Content-type': 'application/json',  # headers!!!
@@ -72,8 +86,12 @@ new_shop = {'first_name': 'fn_shop1',
 #                                                      'Authorization': f'{TOKEN_user1}'})
 
 '''Partner state'''
-# data = requests.get(base_url + us['partner_state'], headers={'Content-type': 'application/json',  # headers!!!
-#                                                           'Authorization': f'{TOKEN_maxim}'})
+# data = requests.get(base_url + us['partner_state'], headers={'Content-type': 'application/json',
+#                                                              'Authorization': f'{TOKEN_jorik}'})
+
+# data = requests.post(base_url + us['partner_state'], headers={'Content-type': 'application/json',
+#                                                              'Authorization': f'{TOKEN_jorik}',
+#                                                               'state': f'{True}'})
 
 '''Partner update'''
 # data = requests.post(base_url + us['update'], headers={'Authorization': f'{TOKEN_vagran}'},

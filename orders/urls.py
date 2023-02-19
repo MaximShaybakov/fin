@@ -14,5 +14,4 @@ urlpatterns = [
     path('order/', OrderView.as_view(), name='order'),
     path('products/', ProductInfoView.as_view(), name='products'),
     path('shops/', ShopView.as_view(), name='shops'),
-    path('user/contact/', ContactView.as_view(), name='user-contact'),
 ]

@@ -70,9 +70,9 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     company = models.CharField(verbose_name='Компания', max_length=40, blank=True)
     position = models.CharField(verbose_name='Должность', max_length=40, blank=True)
+    username_validator = UnicodeUsernameValidator()
     username = models.CharField(_('username'),
                                 max_length=150,
-                                validators=[UnicodeUsernameValidator(), ],
                                 error_messages={'unique': _("A user with that username already exists."),
                                                 },
                                 )
@@ -191,7 +191,7 @@ class Contact(models.Model):
 
     city = models.CharField(max_length=50, verbose_name='Город')
     street = models.CharField(max_length=100, verbose_name='Улица')
-    house = models.CharField(max_length=15, verbose_name='Дом', blank=True)
+    house = models.CharField(max_length=15, verbose_name='Дом')
     structure = models.CharField(max_length=15, verbose_name='Корпус', blank=True)
     building = models.CharField(max_length=15, verbose_name='Строение', blank=True)
     apartment = models.CharField(max_length=15, verbose_name='Квартира', blank=True)
@@ -217,7 +217,7 @@ class Order(models.Model):
 
     class Meta:
         verbose_name = 'Заказ'
-        verbose_name_plural = "Список заказ"
+        verbose_name_plural = "Список заказов"
         ordering = ('-dt',)
 
     def __str__(self):
