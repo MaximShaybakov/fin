@@ -230,13 +230,12 @@ class ContactView(APIView):
 
     # добавить новый контакт
     def post(self, request, *args, **kwargs):
-        print(request.stream.read())
+        # request.DATA has been deprecated
 
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
         if {'city', 'street', 'phone'}.issubset(request.data):
-            request.data._mutable = True
             request.data.update({'user': request.user.id})
             serializer = ContactSerializer(data=request.data)
 

@@ -185,7 +185,7 @@ class ProductParameter(models.Model):
 
 
 class Contact(models.Model):
-    user = models.ForeignKey(User, verbose_name='Пользователь',
+    user = models.ForeignKey('User', verbose_name='Пользователь',
                              related_name='contacts', blank=True,
                              on_delete=models.CASCADE)
 
