@@ -18,6 +18,7 @@ from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.http import JsonResponse
 from yaml import Loader, load as load_yaml
+from ujson import loads as load_json
 from rest_framework.response import Response
 import requests
 
@@ -437,7 +438,6 @@ class BasketView(APIView):
                             objects_created += 1
 
                     else:
-
                         JsonResponse({'Status': False, 'Errors': serializer.errors})
 
                 return JsonResponse({'Status': True, 'Создано объектов': objects_created})
