@@ -66,13 +66,13 @@ new_shop = {'first_name': 'fn_shop1',
 # data = requests.get(base_url + us['contacts'], headers={'Content-type': 'application/json',
 #                                                         'Authorization': f'{TOKEN_user1}'})
 
-data = requests.post(base_url + us['contacts'], headers={'Content-type': 'application/json',
-                                                        'Authorization': f'{TOKEN_user1}'},
-                     json={'user': 3,
-                           'city': 'city_user1',
-                           'street': 'street_user1',
-                           'house': 'house_user1',
-                           'phone': 'phone_user1'})
+# data = requests.post(base_url + us['contacts'], headers={'Content-type': 'application/json',
+#                                                         'Authorization': f'{TOKEN_user1}'},
+#                      json={'user': 3,
+#                            'city': 'city_user1',
+#                            'street': 'street_user1',
+#                            'house': 'house_user1',
+#                            'phone': 'phone_user1'})
 
 # data = requests.delete(base_url + us['contacts'], headers={'Content-type': 'application/json',
 #                                                            'Authorization': f'{TOKEN_user1}'},
