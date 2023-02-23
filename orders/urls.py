@@ -1,4 +1,5 @@
 from django.urls import path  # re_path
+from django_rest_passwordreset.views import reset_password_request_token, reset_password_confirm
 from .views import PartnerUpdate, RegisterAccount, LoginAccount, AccountDetails, \
     CategoryView, ShopView, OrderView, ContactView, ProductInfoView, PartnerState, \
     BasketView
@@ -16,4 +17,6 @@ urlpatterns = [
     path('products/', ProductInfoView.as_view(), name='products'),
     path('shops/', ShopView.as_view(), name='shops'),
     path('basket/', BasketView.as_view(), name='basket'),
+    path('user/password_reset', reset_password_request_token, name='password-reset'),
+    path('user/password_reset/confirm', reset_password_confirm, name='password-reset-confirm'),
 ]
