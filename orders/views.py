@@ -1,6 +1,7 @@
 from distutils.util import strtobool
 from .models import Shop, Category, ProductInfo, ProductParameter, Product, Parameter, \
-    Contact, Order, ConfirmEmailToken, OrderItem
+    Contact, Order, ConfirmEmailToken, OrderItem, User
+from django.conf.global_settings import AUTH_USER_MODEL
 from .serializers import UserSerializer, CategorySerializer, ProductInfoSerializer, \
     ShopSerializer, ContactSerializer, OrderSerializer, OrderItemSerializer
 from django.contrib.auth import authenticate
@@ -12,7 +13,7 @@ from datetime import datetime
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .permissions import IsOwner
 from django.db.models import Q, Sum, F
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
@@ -304,7 +305,6 @@ class OrderView(APIView):
             'ordered_items__product_info__product__category',
             'ordered_items__product_info__product_parameters__parameter').select_related('contact').annotate(
             total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
-
         serializer = OrderSerializer(order, many=True)
         return Response(serializer.data)
 
@@ -313,7 +313,7 @@ class OrderView(APIView):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
-        if {'id', 'contact'}.issubset(request.data):
+        if {'id', 'contact'}.issubset(request.data): # id-заказа
             if request.data['id'].isdigit():
                 try:
                     is_updated = Order.objects.filter(
@@ -325,9 +325,11 @@ class OrderView(APIView):
                 else:
                     if is_updated:
                         # new_order.send(sender=self.__class__, user_id=request.user.id)
-                        send_mail(subject=None,
-                                  message=f'Your order from Shop',
-                                  recipient_list=[str(request.data['email'])],
+                        # cnts_users = User.objects.get(id=self.request.user.id).email
+                        send_mail(subject='Your order',
+                                  message=f'New order',
+                                  from_email='maksim.shaibakov@yandex.ru',
+                                  recipient_list=['momon_boton@mail.ru',],
                                   fail_silently=True)
                         return JsonResponse({'Status': True})
 
@@ -341,7 +343,6 @@ class PartnerState(APIView):
 
     # получить текущий статус
     def get(self, request, *args, **kwargs):
-        print(request.data)
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
