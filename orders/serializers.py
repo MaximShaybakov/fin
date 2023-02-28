@@ -53,7 +53,7 @@ class ProductParameterSerializer(ModelSerializer):
 
 
 class ProductInfoSerializer(ModelSerializer):
-    product = ProductSerializer(read_only=True)
+    product = ProductSerializer(read_only=True, many=True)
     product_parameters = ProductParameterSerializer(read_only=True, many=True)
 
     class Meta:
@@ -73,7 +73,7 @@ class OrderItemSerializer(ModelSerializer):
 
 
 class OrderItemCreateSerializer(OrderItemSerializer):
-    product_info = ProductInfoSerializer(read_only=True)
+    product_info = ProductInfoSerializer(read_only=True, many=True)
 
 
 class OrderSerializer(ModelSerializer):

@@ -1,8 +1,8 @@
 from distutils.util import strtobool
 from .models import Shop, Category, ProductInfo, ProductParameter, Product, Parameter, \
-    Contact, Order, ConfirmEmailToken
+    Contact, Order, ConfirmEmailToken, OrderItem
 from .serializers import UserSerializer, CategorySerializer, ProductInfoSerializer, \
-    ShopSerializer, ContactSerializer, OrderSerializer
+    ShopSerializer, ContactSerializer, OrderSerializer, OrderItemSerializer
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.password_validation import validate_password
@@ -321,12 +321,12 @@ class OrderView(APIView):
                         contact_id=request.data['contact'],
                         state='new')
                 except IntegrityError as error:
-                    print(error)
                     return JsonResponse({'Status': False, 'Errors': 'Неправильно указаны аргументы'})
                 else:
                     if is_updated:
                         # new_order.send(sender=self.__class__, user_id=request.user.id)
-                        send_mail(subject=None, message='Status "Done"',
+                        send_mail(subject=None,
+                                  message=f'Your order from Shop',
                                   recipient_list=[str(request.data['email'])],
                                   fail_silently=True)
                         return JsonResponse({'Status': True})
@@ -416,18 +416,20 @@ class BasketView(APIView):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
-        items_sting = request.data.get('items')
-        if items_sting:
+        items_string = request.data.get('items')
+        if items_string:
             try:
-                items_dict = load_json(items_sting)
+                items_dict = load_json(items_string)
             except ValueError:
                 JsonResponse({'Status': False, 'Errors': 'Неверный формат запроса'})
             else:
                 basket, _ = Order.objects.get_or_create(user_id=request.user.id, state='basket')
+                print(basket)
                 objects_created = 0
                 for order_item in items_dict:
                     order_item.update({'order': basket.id})
                     serializer = OrderItemSerializer(data=order_item)
+
                     if serializer.is_valid():
                         try:
                             serializer.save()
