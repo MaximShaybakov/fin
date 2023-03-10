@@ -78,7 +78,6 @@ class OrderItemCreateSerializer(OrderItemSerializer):
 
 class OrderSerializer(ModelSerializer):
     ordered_items = OrderItemCreateSerializer(read_only=True, many=True)
-
     total_sum = IntegerField()
     contact = ContactSerializer(read_only=True)
 
