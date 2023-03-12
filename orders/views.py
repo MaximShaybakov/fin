@@ -1,13 +1,13 @@
 from distutils.util import strtobool
 from .models import Shop, Category, ProductInfo, ProductParameter, Product, Parameter, \
     Contact, Order, ConfirmEmailToken, OrderItem, User
-from django.conf.global_settings import AUTH_USER_MODEL
+from django.conf.global_settings import EMAIL_HOST_USER
 from .serializers import UserSerializer, CategorySerializer, ProductInfoSerializer, \
     ShopSerializer, ContactSerializer, OrderSerializer, OrderItemSerializer
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.password_validation import validate_password
-# from django.utils.decorators import
+from rest_framework.decorators import api_view, permission_classes
 from django.db import IntegrityError
 from rest_framework.views import APIView
 from datetime import datetime
@@ -119,13 +119,15 @@ class LoginAccount(APIView):
     permission_classes = [AllowAny,]
     # Authorization by POST method
     def post(self, request, *args, **kwargs):
-        # print(request.data)
         if {'email', 'password'}.issubset(request.data):
             user = authenticate(request.data, username=request.data['email'], password=request.data['password'])
 
             if user is not None:
                 if user.is_active:
-                    # print(user.last_login)
+                    user_last_login = User.objects.update_or_create(
+                        last_login=datetime.utcnow(),
+                        default={'last_login': ''},
+                    )
                     token, _ = Token.objects.get_or_create(user=user)
                     return JsonResponse({'Status': True, 'Token': token.key})
             return JsonResponse({'Status': False, 'Errors': 'Не удалось авторизовать'})
@@ -222,8 +224,7 @@ class ContactView(APIView):
     """
     Класс для работы с контактами покупателей
     """
-    permission_classes = [IsOwner,]
-
+    permission_classes = [IsOwner, IsAuthenticated]
     # получить мои контакты
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -297,6 +298,7 @@ class OrderView(APIView):
     """
 
     # получить мои заказы
+    @permission_classes([IsOwner, IsAuthenticated])
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
@@ -327,10 +329,11 @@ class OrderView(APIView):
                     return JsonResponse({'Status': False, 'Errors': 'Неправильно указаны аргументы'})
                 else:
                     if is_updated:
+                        # включен тестовый бэкенд отображения email в консоли
                         send_mail(subject='Your order',
                                   message=f'New order',
-                                  from_email='***@yandex.ru',
-                                  recipient_list=['***@mail.ru',],
+                                  from_email=f'{EMAIL_HOST_USER}',
+                                  recipient_list=[f'{self.request.user.email}',],
                                   fail_silently=True)
                         return JsonResponse({'Status': True})
 
@@ -376,12 +379,10 @@ class ConfirmAccount(APIView):
     """
     Класс для подтверждения почтового адреса
     """
-    # Регистрация методом POST
+    permission_classes = [IsOwner, IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
-
-        # проверяем обязательные аргументы
         if {'email', 'token'}.issubset(request.data):
-
             token = ConfirmEmailToken.objects.filter(user__email=request.data['email'],
                                                      key=request.data['token']).first()
             if token:
@@ -399,6 +400,7 @@ class BasketView(APIView):
     """
     Класс для работы с корзиной пользователя
     """
+    permission_classes = [IsOwner, IsAuthenticated]
 
     # получить корзину
     def get(self, request, *args, **kwargs):
@@ -426,7 +428,6 @@ class BasketView(APIView):
                 JsonResponse({'Status': False, 'Errors': 'Неверный формат запроса'})
             else:
                 basket, _ = Order.objects.get_or_create(user_id=request.user.id, state='basket')
-                print(basket)
                 objects_created = 0
                 for order_item in items_dict:
                     order_item.update({'order': basket.id})
@@ -502,7 +503,7 @@ class PartnerOrders(APIView):
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
 
         order = Order.objects.filter(
-            ordered_items__product_info__shop__user_id=request.user.id).exclude(state='basket').prefetch_related(
+            ordered_items__product_info__shop__user_id=self.request.user.pk).exclude(state='basket').prefetch_related(
             'ordered_items__product_info__product__category',
             'ordered_items__product_info__product_parameters__parameter').select_related('contact').annotate(
             total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
