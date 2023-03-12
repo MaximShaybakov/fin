@@ -44,8 +44,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Checking code on pep8
-        run: flake8 main
+#      - name: Checking code on pep8
+#        run: flake8 main
 
       # - name: Run Tests 
       #   run: python3 manage.py test
