@@ -330,7 +330,7 @@ class OrderView(APIView):
                         send_mail(subject='Your order',
                                   message=f'New order',
                                   from_email='your_email',
-                                  recipient_list=['your_email',],
+                                  recipient_list=['email',],
                                   fail_silently=True)
                         return JsonResponse({'Status': True})
 
