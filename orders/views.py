@@ -302,10 +302,12 @@ class OrderView(APIView):
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
         order = Order.objects.filter(
-            user_id=request.user.id).exclude(state='basket').prefetch_related(
+            user_id=self.request.user.pk).exclude(state='basket').prefetch_related(
             'ordered_items__product_info__product__category',
-            'ordered_items__product_info__product_parameters__parameter').select_related('contact').annotate(
+            'ordered_items__product_info__product_parameters__parameter').select_related(
+            'contact').annotate(
             total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
+
         serializer = OrderSerializer(order, many=True)
         return Response(serializer.data)
 
@@ -325,12 +327,10 @@ class OrderView(APIView):
                     return JsonResponse({'Status': False, 'Errors': 'Неправильно указаны аргументы'})
                 else:
                     if is_updated:
-                        # new_order.send(sender=self.__class__, user_id=request.user.id)
-                        # cnts_users = User.objects.get(id=self.request.user.id).email
                         send_mail(subject='Your order',
                                   message=f'New order',
-                                  from_email='your_email',
-                                  recipient_list=['email',],
+                                  from_email='***@yandex.ru',
+                                  recipient_list=['***@mail.ru',],
                                   fail_silently=True)
                         return JsonResponse({'Status': True})
 

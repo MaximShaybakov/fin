@@ -1,6 +1,6 @@
 .venv/
 __pycache__/
-#/.env
+.env
 *.pyc
 requests-examples.http
 launch.json
