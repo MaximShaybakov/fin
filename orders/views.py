@@ -329,8 +329,8 @@ class OrderView(APIView):
                         # cnts_users = User.objects.get(id=self.request.user.id).email
                         send_mail(subject='Your order',
                                   message=f'New order',
-                                  from_email='maksim.shaibakov@yandex.ru',
-                                  recipient_list=['momon_boton@mail.ru',],
+                                  from_email='your_email',
+                                  recipient_list=['your_email',],
                                   fail_silently=True)
                         return JsonResponse({'Status': True})
 
