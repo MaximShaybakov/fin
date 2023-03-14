@@ -7,6 +7,7 @@ from .serializers import UserSerializer, CategorySerializer, ProductInfoSerializ
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.models import update_last_login
 from rest_framework.decorators import api_view, permission_classes
 from django.db import IntegrityError
 from rest_framework.views import APIView
@@ -85,8 +86,7 @@ class RegisterAccount(APIView):
 
         # проверяем обязательные аргументы
         if {'first_name', 'last_name', 'email', 'password', 'company', 'position'}.issubset(request.data):
-            errors = {}            
-
+            errors = {}
             # проверяем пароль на сложность
             try:
                 validate_password(request.data['password'])
@@ -124,10 +124,7 @@ class LoginAccount(APIView):
 
             if user is not None:
                 if user.is_active:
-                    user_last_login = User.objects.update_or_create(
-                        last_login=datetime.utcnow(),
-                        default={'last_login': ''},
-                    )
+                    update_last_login(sender=user.__class__, user=user)
                     token, _ = Token.objects.get_or_create(user=user)
                     return JsonResponse({'Status': True, 'Token': token.key})
             return JsonResponse({'Status': False, 'Errors': 'Не удалось авторизовать'})
@@ -142,7 +139,7 @@ class AccountDetails(APIView):
 
     # получить данные
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
+        if not self.request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
         serializer = UserSerializer(request.user)
@@ -166,11 +163,12 @@ class AccountDetails(APIView):
                     error_array.append(item)
                 return JsonResponse({'Status': False, 'Errors': {'password': error_array}})
             else:
-                request.user.set_password(request.data['password'])  # НЕ ХЭШИРУЕТ ПАРОЛИ!
+                self.request.user.set_password(request.data['password'])
 
         # проверяем остальные данные
         user_serializer = UserSerializer(request.user, data=request.data, partial=True)
         if user_serializer.is_valid():
+            request.data._mutable = True
             user_serializer.save()
             return JsonResponse({'Status': True})
         else:
@@ -241,8 +239,9 @@ class ContactView(APIView):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
-        if {'city', 'street', 'phone'}.issubset(request.data):
-            request.data.update({'user': request.user.id})
+        if {'city', 'street', 'house', 'phone'}.issubset(request.data):
+            request.data._mutable = True
+            request.data.update({'user': self.request.user.pk})
             serializer = ContactSerializer(data=request.data)
 
             if serializer.is_valid():
@@ -278,16 +277,15 @@ class ContactView(APIView):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
-        if 'id' in request.data:
-            if request.data['id'].isdigit():
-                contact = Contact.objects.filter(id=request.data['id'], user_id=request.user.id).first()
-                if contact:
-                    serializer = ContactSerializer(contact, data=request.data, partial=True)
-                    if serializer.is_valid():
-                        serializer.save()
-                        return JsonResponse({'Status': True})
-                    else:
-                        JsonResponse({'Status': False, 'Errors': serializer.errors})
+        if ('contact_id' in request.data) and request.data['contact_id'].isdigit():
+            contact = Contact.objects.filter(id=request.data['contact_id'], user_id=self.request.user.pk).first()
+            if contact:
+                serializer = ContactSerializer(contact, data=request.data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    return JsonResponse({'Status': True})
+                else:
+                    JsonResponse({'Status': False, 'Errors': serializer.errors})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
     
@@ -367,7 +365,7 @@ class PartnerState(APIView):
         state = request.data.get('state')
         if state:
             try:
-                Shop.objects.filter(user_id=request.user.id).update(state=strtobool(state))
+                Shop.objects.filter(user_id=self.request.user.pk).update(state=strtobool(state))
                 return JsonResponse({'Status': True})
             except ValueError as error:
                 return JsonResponse({'Status': False, 'Errors': str(error)})
@@ -382,6 +380,7 @@ class ConfirmAccount(APIView):
     permission_classes = [IsOwner, IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+
         if {'email', 'token'}.issubset(request.data):
             token = ConfirmEmailToken.objects.filter(user__email=request.data['email'],
                                                      key=request.data['token']).first()
