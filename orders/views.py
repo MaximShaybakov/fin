@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import update_last_login
+from django.contrib.auth.views import PasswordResetView
 from rest_framework.decorators import api_view, permission_classes
 from django.db import IntegrityError
 from rest_framework.views import APIView
@@ -16,6 +17,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .permissions import IsOwner
 from django.db.models import Q, Sum, F
 from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
+from django_rest_passwordreset.views import ResetPasswordRequestToken, ResetPasswordConfirm
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
@@ -23,6 +25,7 @@ from django.http import JsonResponse
 from yaml import Loader, load as load_yaml
 from ujson import loads as load_json
 from rest_framework.response import Response
+from django.shortcuts import render
 import requests
 
 
@@ -509,3 +512,10 @@ class PartnerOrders(APIView):
 
         serializer = OrderSerializer(order, many=True)
         return Response(serializer.data)
+
+
+def user_logout(request, *args, **kwargs):
+    text = 'User logout'
+    context = {'message': text}
+    template_name = 'orders/password_reset.html'
+    return render(request, template_name, context)
