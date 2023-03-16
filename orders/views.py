@@ -1,4 +1,4 @@
-from distutils.util import strtobool
+from orders.auxiliary import strtobool
 from .models import Shop, Category, ProductInfo, ProductParameter, Product, Parameter, \
     Contact, Order, ConfirmEmailToken, OrderItem, User
 from django.conf.global_settings import EMAIL_HOST_USER
