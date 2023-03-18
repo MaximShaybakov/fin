@@ -1,0 +1,67 @@
+# примеры API-запросов
+
+@baseUrl = http://127.0.0.1:8000
+
+# создание продукта
+POST {{baseUrl}}/api/v1/partner/update/
+Authorization: Token 73843f8b6066517a836d659abd0c78ebd538a25d
+Content-Type: application/json
+
+{
+  "url": "https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1K30Oeujse-05WCEGEFZC6oOX4Q_kACPy"
+}
+
+
+###
+
+# register new user
+POST {{baseUrl}}/api/v1/user/register/
+Content-Type: application/json
+
+{
+  "first_name": "Bon",
+  "last_name": "Pari",
+  "email": "bonpari@mail.com",
+  "password": "bon-pari123",
+  "company": "Warn. Brothers",
+  "position": "technic",
+  "type": "shop"
+}
+
+###
+
+GET {{baseUrl}}/api/v1/user/details/
+Authorization: Token 33667d0bc49e1fea2d4396e0ee0e4934bcc93bb1
+Content-Type: application/json
+
+{
+  "email": "vasya-pupkin@mail.com"
+}
+
+###
+
+POST {{baseUrl}}/api/v1/user/login/
+Content-Type: application/json
+
+{
+  "email": "vagvar@mail.ru",
+  "password": "sgers64$"
+}
+
+###
+
+GET {{baseUrl}}/api/v1/categories/
+Authorization: Token 33667d0bc49e1fea2d4396e0ee0e4934bcc93bb1
+Content-Type: application/json
+
+###
+
+GET {{baseUrl}}/api/v1/shops/
+Authorization: Token 33667d0bc49e1fea2d4396e0ee0e4934bcc93bb1
+Content-Type: application/json
+
+###
+
+GET {{baseUrl}}/api/v1/user/contact/
+Authorization: Token 33667d0bc49e1fea2d4396e0ee0e4934bcc93bb1
+Content-Type: application/json
