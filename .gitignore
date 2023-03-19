@@ -8,3 +8,4 @@ signals.py
 .vscode/
 .idea/
 .pytest_cache/
+/.coverage
