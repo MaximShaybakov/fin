@@ -7,3 +7,4 @@ launch.json
 signals.py
 .vscode/
 .idea/
+.pytest_cache/

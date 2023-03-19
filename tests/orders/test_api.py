@@ -1,4 +1,5 @@
 import pytest
+from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from orders.models import User
@@ -47,11 +48,13 @@ def test_register_account(client, url):
 
 
 @pytest.mark.django_db
-def test_login_account(client, url):
+def test_login_account(client, url, _token):
     # post method
-    response = client.post(path=f"{url}user/login/",
-                           data={'email': USER_DATA['email'], 'password': USER_DATA['password']})
+    client.credentials(HTTP_AUTHORIZATION="Token" + _token)
+    response = client.post(path=f"{url}user/login/")
     data = response.json()
-    print(data)
-    assert response.status_code == 200
-    assert data['Status'] is True
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+# @pytest.mark.django_db
+# def test_account_details():

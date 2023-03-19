@@ -129,7 +129,7 @@ class LoginAccount(APIView):
                 if user.is_active:
                     update_last_login(sender=user.__class__, user=user)
                     token, _ = Token.objects.get_or_create(user=user)
-                    return JsonResponse({'Status': True, 'Token': token.key})
+                    return JsonResponse({'Status': True, 'Token': token.key}, status=201)
             return JsonResponse({'Status': False, 'Errors': 'Не удалось авторизовать'})
         return Response(request.data)
 
