@@ -1,0 +1,2 @@
+[run]
+omit=tests/*,/.venv/*,.env,.vscode/*,.pytest_cache/*,requests-examples.http,manage.py,dipl_wrk/*,.github/*
