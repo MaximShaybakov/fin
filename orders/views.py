@@ -173,7 +173,7 @@ class AccountDetails(APIView):
         if user_serializer.is_valid():
             request.data._mutable = True
             user_serializer.save()
-            return JsonResponse({'Status': True})
+            return Response({'Status': True, 'Data': user_serializer.data})
         else:
             return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
         

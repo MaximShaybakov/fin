@@ -1,11 +1,11 @@
-.venv/
-__pycache__/
+.venv/*
+__pycache__/*
 .env
 *.pyc
 requests-examples.http
 launch.json
 signals.py
-.vscode/
-.idea/
-.pytest_cache/
+.vscode/*
+.idea/*
+.pytest_cache/*
 /.coverage

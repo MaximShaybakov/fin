@@ -88,9 +88,12 @@ def test_account_details_(url, client, _headers):
              "password": "password_user",
              "company": "company_user",
              "position": "position_user"}
-    response_unauth = client.post(path=f"{url}user/details/", **_headers, data=new_user_data)
+
+    response_unauth = client.post(path=f"{url}user/details/", **new_user_data)
     assert response_unauth.status_code == status.HTTP_403_FORBIDDEN
-    response = client.get(path=f"{url}user/details/", data=new_user_data, **_headers)
+
+    client.credentials(**_headers)
+    response = client.post(path=f"{url}user/details/", **new_user_data)
     data = response.json()
     assert response.status_code == status.HTTP_200_OK
-    assert data['email'] == USER_DATA['email']
+    assert data['Data']['email'] == new_user_data['email']
