@@ -182,6 +182,7 @@ class CategoryView(ListAPIView):
     """
     Класс для просмотра категорий
     """
+    permission_classes = [AllowAny,]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -190,6 +191,11 @@ class ProductInfoView(APIView):
     """
     Класс для поиска товаров
     """
+    permission_classes = [AllowAny,]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['product', 'shop', 'price_rrc']
+    search_fields = ['product__name', 'shop',]
+
     def get(self, request, *args, **kwargs):
 
         query = Q(shop__state=True)
@@ -217,6 +223,7 @@ class ShopView(ListAPIView):
     """
     Класс для просмотра списка магазинов
     """
+    permission_classes = [AllowAny, ]
     queryset = Shop.objects.filter(state=True)
     serializer_class = ShopSerializer
     

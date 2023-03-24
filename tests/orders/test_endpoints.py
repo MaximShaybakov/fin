@@ -1,7 +1,8 @@
 import pytest
-from user_data import USER_DATA, NEW_USER_DATA
+from tests.orders.user_data import USER_DATA, NEW_USER_DATA
 from rest_framework import status
-from fixtures import client, _url, _headers, _user, user_factory, category_factory, shop_factory
+from tests.orders.fixtures import client, _url, _headers, _user, user_factory, category_factory, shop_factory, \
+    product_info_factory
 from orders.models import User
 
 
@@ -40,15 +41,15 @@ def test_account_details_(_url, client, _headers):
     assert response_unauth.status_code == status.HTTP_403_FORBIDDEN
 
     client.credentials(**_headers)
-    response = client.post(path=f"{_url}user/details/", data=new_user_data)
+    response = client.post(path=f"{_url}user/details/", data=NEW_USER_DATA)
     data = response.json()
     assert response.status_code == status.HTTP_200_OK
-    assert data['Data']['email'] == new_user_data['email']
+    assert data['Data']['email'] == NEW_USER_DATA['email']
 
 
 @pytest.mark.django_db
-def test_category_view(category_facrtory, _url, client, _headers):
-    category = category_facrtory(_quantity=10)
+def test_category_view(category_factory, _url, client, _headers):
+    category = category_factory(_quantity=10)
     response = client.get(path=f'{_url}categories/')
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -60,7 +61,8 @@ def test_category_view(category_facrtory, _url, client, _headers):
 
 
 @pytest.mark.django_db
-def test_product_info_view(_url, client, _headers):
+def test_product_info_view(product_info_factory, _url, client, _headers):
+    prod_info = product_info_factory(_quantity=10, make_m2m=True)
     response = client.get(path=f'{_url}products/')
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -68,8 +70,18 @@ def test_product_info_view(_url, client, _headers):
     response = client.get(path=f'{_url}products/')
     data = response.json()
     assert response.status_code == status.HTTP_200_OK
-    # for index, prod in enumerate(data):
-    #     prod['']
+
+
+# @pytest.mark.django_db
+# def test_shop_view(_url, client, _headers):
+#     response = client.get(path=f'{_url}shops/')
+#     assert response.status_code == status.HTTP_403_FORBIDDEN
+#
+#     client.credentials(**_headers)
+#     response = client.get(path=f'{_url}shops/')
+#     data = response.json()
+#     assert response.status_code == status.HTTP_200_OK
+
 
 
 

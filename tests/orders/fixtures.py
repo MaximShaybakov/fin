@@ -1,22 +1,29 @@
 import pytest
 from rest_framework.test import APIClient
-from user_data import USER_DATA
+from tests.orders.user_data import USER_DATA
 from model_bakery import baker
 from rest_framework.authtoken.models import Token
 from orders.models import User
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def shop_factory():
     def factory(*args, **kwargs):
         return baker.make(_model='Shop', *args, **kwargs)
     return factory
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def category_factory():
     def factory(*args, **kwargs):
         return baker.make(_model='Category', *args, **kwargs)
+    return factory
+
+
+@pytest.fixture(autouse=True)
+def product_factory():
+    def factory(*args, **kwargs):
+        return baker.make(_model='Product', *args, **kwargs)
     return factory
 
 
@@ -37,6 +44,20 @@ def _headers(_user):
 def user_factory():
     def factory(*args, **kwargs):
         return baker.make(_model='User', *args, **kwargs)
+    return factory
+
+
+@pytest.fixture(autouse=True)
+def product_factory():
+    def factory(*args, **kwargs):
+        return baker.make(_model='Product', *args, **kwargs)
+    return factory
+
+
+@pytest.fixture
+def product_info_factory():
+    def factory(*args, **kwargs):
+        return baker.make(_model='ProductInfo', *args, **kwargs)
     return factory
 
 
