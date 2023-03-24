@@ -8,4 +8,4 @@ signals.py
 .idea/*
 .pytest_cache/*
 /.coverage
-/.env
+#/.env
