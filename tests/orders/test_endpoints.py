@@ -51,10 +51,6 @@ def test_account_details_(_url, client, _headers):
 def test_category_view(category_factory, _url, client, _headers):
     category = category_factory(_quantity=10)
     response = client.get(path=f'{_url}categories/')
-    assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    client.credentials(**_headers)
-    response = client.get(path=f'{_url}categories/')
     data = response.json()
     assert response.status_code == status.HTTP_200_OK
     assert data['count'] == len(category)
@@ -64,25 +60,12 @@ def test_category_view(category_factory, _url, client, _headers):
 def test_product_info_view(product_info_factory, _url, client, _headers):
     prod_info = product_info_factory(_quantity=10, make_m2m=True)
     response = client.get(path=f'{_url}products/')
-    assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    client.credentials(**_headers)
-    response = client.get(path=f'{_url}products/')
     data = response.json()
     assert response.status_code == status.HTTP_200_OK
 
 
-# @pytest.mark.django_db
-# def test_shop_view(_url, client, _headers):
-#     response = client.get(path=f'{_url}shops/')
-#     assert response.status_code == status.HTTP_403_FORBIDDEN
-#
-#     client.credentials(**_headers)
-#     response = client.get(path=f'{_url}shops/')
-#     data = response.json()
-#     assert response.status_code == status.HTTP_200_OK
-
-
-
-
-
+@pytest.mark.django_db
+def test_shop_view(_url, client, _headers):
+    response = client.get(path=f'{_url}shops/')
+    data = response.json()
+    assert response.status_code == status.HTTP_200_OK

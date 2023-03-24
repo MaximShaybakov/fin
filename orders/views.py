@@ -211,8 +211,7 @@ class ProductInfoView(APIView):
             query = query & Q(product__category_id=category_id)
 
         # фильтруем и отбрасываем дубликаты
-        queryset = ProductInfo.objects.filter(
-            query).select_related(
+        queryset = ProductInfo.objects.filter(query).select_related(
             'shop', 'product__category').prefetch_related(
             'product_parameters__parameter').distinct()
 
@@ -342,7 +341,8 @@ class OrderView(APIView):
                     if is_updated:
                         # включен тестовый бэкенд отображения email в консоли
                         send_mail(subject='Your order',
-                                  message=f'New order',
+                                  message=f'New order\n',
+                                          # f'{Order.objects.filter(user_id=self.request.user.pk)}',
                                   from_email=f'{EMAIL_HOST_USER}',
                                   recipient_list=[f'{self.request.user.email}',],
                                   fail_silently=True)
