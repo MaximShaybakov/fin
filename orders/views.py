@@ -171,7 +171,7 @@ class AccountDetails(APIView):
         # проверяем остальные данные
         user_serializer = UserSerializer(request.user, data=request.data, partial=True)
         if user_serializer.is_valid():
-            request.data._mutable = True
+            request.data.copy()
             user_serializer.save()
             return Response({'Status': True, 'Data': user_serializer.data})
         else:
