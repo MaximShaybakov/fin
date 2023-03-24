@@ -5,6 +5,8 @@ from django.conf.global_settings import EMAIL_HOST_USER
 from .serializers import UserSerializer, CategorySerializer, ProductInfoSerializer, \
     ShopSerializer, ContactSerializer, OrderSerializer, OrderItemSerializer
 from django.contrib.auth import authenticate
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import update_last_login
@@ -194,7 +196,7 @@ class ProductInfoView(APIView):
     permission_classes = [AllowAny,]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['product', 'shop', 'price_rrc']
-    search_fields = ['product__name', 'shop',]
+    search_fields = ['product__name', 'shop__state',]
 
     def get(self, request, *args, **kwargs):
 
