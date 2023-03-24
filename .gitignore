@@ -1,6 +1,5 @@
 .venv/*
 __pycache__/*
-#.env
 *.pyc
 requests-examples.http
 launch.json
@@ -9,3 +8,4 @@ signals.py
 .idea/*
 .pytest_cache/*
 /.coverage
+/.env
