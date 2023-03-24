@@ -49,7 +49,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          docker_compose up
+          docker-compose up
           pytest
         env:
           SECRET_KEY: ${{ env.SECRET_KEY }}
