@@ -48,8 +48,9 @@ jobs:
 #        run: flake8
 
       - name: Run Tests
-        run: docker-compose up
-        run: pytest
+        run: |
+          docker_compose up
+          pytest
         env:
           SECRET_KEY: ${{ env.SECRET_KEY }}
           DEBUG: "0"
