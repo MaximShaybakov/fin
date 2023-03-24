@@ -126,6 +126,8 @@ def test_product_info_view(_url, client, _headers):
     response = client.get(path=f'{_url}products/')
     data = response.json()
     assert response.status_code == status.HTTP_200_OK
+    # for index, prod in enumerate(data):
+    #     prod['']
 
 
 

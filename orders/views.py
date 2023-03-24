@@ -299,7 +299,8 @@ class OrderView(APIView):
     """
 
     # получить мои заказы
-    @permission_classes([IsOwner, IsAuthenticated])
+    permission_classes = [IsOwner, IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
@@ -347,6 +348,7 @@ class PartnerState(APIView):
     """
 
     # получить текущий статус
+    @permission_classes([IsAuthenticated])
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
@@ -359,6 +361,7 @@ class PartnerState(APIView):
         return Response(serializer.data)
 
     # изменить текущий статус
+    @permission_classes([IsAuthenticated, IsOwner])
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
